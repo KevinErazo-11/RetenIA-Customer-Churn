@@ -1,61 +1,90 @@
-# RetenIA | Proyecto final de Aprendizaje Automático
+# RetenIA
 
-**Autor:** Kevin Andrés Erazo Yepez. **Dataset:** [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn).
+**Inteligencia predictiva para retener clientes.**
 
-Versión reconstruida desde cero con **Grid Search, Random Search, Hyperband (Optuna), NSGA-II, SHAP, LIME**, una aplicación Streamlit comercial y un **Business Pitch Beamer/LaTeX en PDF**. Conserva el EDA original (33 celdas) y las decisiones de limpieza. No incluye resultados de entrenamientos anteriores ni métricas inventadas.
+RetenIA es una plataforma de análisis de abandono de clientes (*customer churn*) que transforma datos comerciales en estimaciones de riesgo, explicaciones interpretables y escenarios de priorización. Su interfaz interactiva permite explorar una cartera, evaluar perfiles individuales y orientar decisiones de retención con evidencia cuantitativa.
 
-## Inicio limpio en Ubuntu
+**Enfoque:** telecomunicaciones · **Aplicación:** Streamlit · **Idioma:** español
 
-La raíz del proyecto es la carpeta **V2/**. Antes de reemplazar tu V2 anterior, **haz una copia de seguridad** para conservar tus resultados previos. Descomprime el ZIP final en una carpeta temporal y mueve la nueva `V2` a la ubicación deseada.
+---
+
+## Qué ofrece RetenIA
+
+| Capacidad | Valor para el negocio |
+| --- | --- |
+| **Análisis de cartera** | Segmentación por contrato, antigüedad, servicios y facturación, con indicadores y filtros interactivos. |
+| **Predicción de abandono** | Estimación de la probabilidad de baja de un cliente a partir de su perfil. |
+| **Evaluación de modelos** | Comparación de calidad predictiva, errores de clasificación y curvas ROC y Precision–Recall. |
+| **Optimización inteligente** | Comparación de Grid Search, Random Search y Hyperband; análisis multiobjetivo con NSGA-II. |
+| **Explainable AI** | Interpretación global y local de predicciones mediante SHAP, LIME y Feature Importance. |
+| **Planificación comercial** | Priorización de contactos y simulación de campañas con presupuesto y supuestos ajustables. |
+
+## Plataforma
+
+La aplicación organiza el trabajo en nueve módulos: **Inicio**, **Exploratory Data Analysis**, **Model Performance**, **Hyperparameter Optimization**, **NSGA-II · Pareto Frontier**, **Explainable AI · SHAP y LIME**, **Prediction & Explainability**, **Business Application** e **Información del servicio**.
+
+Los modelos y resultados se cargan desde artefactos previamente generados. **La aplicación no reentrena modelos durante su uso.**
+
+## Rendimiento predictivo
+
+La evaluación se realiza sobre **1.409 clientes reservados para prueba**, separados del proceso de selección y optimización.
+
+| Modelo | F1-score | ROC-AUC | Recall |
+| --- | ---: | ---: | ---: |
+| Logistic Regression | 0,604 | 0,842 | 0,559 |
+| Random Forest (base) | 0,553 | 0,818 | 0,505 |
+| Random Forest seleccionado mediante NSGA-II | 0,581 | 0,830 | 0,535 |
+
+La solución seleccionada mediante **NSGA-II** considera conjuntamente el F1-score de validación cruzada y el tiempo de inferencia. **Logistic Regression obtuvo un F1-score superior en test**; esa diferencia se conserva explícitamente para una evaluación objetiva de alternativas. La latencia depende del entorno de ejecución.
+
+![Frente de Pareto: rendimiento frente a tiempo de inferencia](figures/frente_pareto.png)
+
+## Diseño técnico
+
+El flujo de análisis sigue cinco etapas:
+
+1. **Preparación de datos:** validación del esquema, tratamiento de `TotalCharges` y exclusión del identificador como predictor.
+2. **Preprocesamiento reproducible:** `ColumnTransformer` y `Pipeline` con escalado numérico y codificación One-Hot.
+3. **Validación:** partición estratificada 80/20 y validación cruzada estratificada de tres particiones dentro de entrenamiento.
+4. **Optimización:** Grid Search, Random Search, Hyperband (Optuna) y NSGA-II para explorar el compromiso entre calidad y latencia.
+5. **Interpretabilidad:** SHAP, LIME y Feature Importance para comprender las predicciones sin atribuirles causalidad.
+
+**Datos de referencia:** [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn), con 7.043 registros y 19 variables predictoras. Se trata de un conjunto de demostración; no representa una integración con datos operativos de una empresa.
+
+## Ejecutar localmente
+
+Requisitos: Python, Git y un entorno virtual. Los modelos entrenados y el conjunto de datos de demostración están incluidos en el repositorio.
 
 ```bash
-source "/home/kevin-erazo/Documentos/Ambiente Virtual/bin/activate"
-PROJECT="/home/kevin-erazo/OneDrive/8) Octavo Semestre/Aprendizaje Automatico/7. Optimización de Machine Learning, Explainable AI y Business Pitch/V2"
-cd "$PROJECT"
+git clone git@github.com:KevinErazo-11/RetenIA-Customer-Churn.git
+cd RetenIA-Customer-Churn
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install -r requirements.txt
-python -m pip check
-python run_experiments.py
-python build_pitch.py
-python VALIDAR_ENTREGA.py
 python -m streamlit run app.py
 ```
 
-Si Kaggle no descarga automáticamente los datos, copia **`WA_Fn-UseC_-Telco-Customer-Churn.csv`** a `data/` desde el enlace oficial y vuelve a ejecutar `python run_experiments.py`. Para desarrollar el notebook: ejecuta `python build_notebook.py` (ya se incluye el `.ipynb` construido), selecciona tu kernel y usa **Run All**; esta acción vuelve a entrenar todo. Para evitar entrenar dos veces, basta con el script para servir la app; ejecuta el notebook una vez cuando necesites guardar las salidas de la entrega.
+Abrir `http://localhost:8501` en el navegador.
 
-**No uses `--quick` en la entrega.** Su único propósito es una prueba de software.
+## Estructura del repositorio
 
-## Recorrido comercial por Streamlit
+```text
+app.py                   Plataforma interactiva
+src/                     Preparación de datos, optimización y lógica comercial
+artifacts/               Pipelines entrenados, métricas y explicaciones
+figures/                 Visualizaciones de evaluación
+notebooks/               Análisis exploratorio y experimentación reproducible
+data/                    Dataset de demostración
+tests/                   Pruebas automatizadas
+requirements.txt         Dependencias del entorno
+```
 
-1. Inicio — síntesis de cartera y valor de RetenIA.
-2. Exploratory Data Analysis — KPIs, segmentación y visualizaciones interactivas.
-3. Model Performance — Logistic Regression, Random Forest, modelo seleccionado, métricas y matriz de confusión.
-4. Hyperparameter Optimization — **Grid Search, Random Search, Hyperband (Optuna)**. Se ven CV, F1, tiempos, recursos, candidatos y podas.
-5. NSGA-II · Pareto Frontier — F1-CV frente a latencia y compromiso operativo.
-6. Explainable AI · SHAP y LIME — visión global, dos perfiles y Random Forest Feature Importance.
-7. Prediction & Explainability — formulario para cliente individual, predicción y explicaciones.
-8. Business Application — costos, prioridades y escenarios comerciales hipotéticos.
-9. Información del servicio — límites, privacidad y uso responsable.
+Los experimentos pueden regenerarse con `python run_experiments.py`. Este proceso vuelve a entrenar modelos y puede producir diferencias en la selección basada en latencia; no es necesario para utilizar la aplicación con los artefactos incluidos.
 
-Las pantallas se expresan en tono **comercial y técnico para el cliente**, sin guiones escolares ni menciones al profesor. Modelos se leen desde `.joblib`; **Streamlit no reentrena**.
+## Alcance y uso responsable
 
-## Metodología y honestidad experimental
+RetenIA es una **demostración funcional de analítica predictiva**, no un sistema validado para decisiones automáticas en producción. Las probabilidades indican asociaciones estadísticas; SHAP y LIME no prueban relaciones causales. Los costos, tasas de respuesta y retornos de las simulaciones son **supuestos hipotéticos**, no resultados comerciales observados. Antes de su adopción operativa se requieren validación con datos reales, revisión de privacidad, monitoreo de desempeño y pruebas controladas de campañas.
 
-- 7.043 registros del CSV original; limpieza de `TotalCharges`, exclusión de `customerID`, 3 características numéricas y 16 categóricas; `ColumnTransformer` y `Pipeline`.
-- `train_test_split` estratificado 80/20 y `StratifiedKFold(3)` solo en train; test aislado hasta cerrar la selección.
-- **Grid Search** exhaustivo: 16 configuraciones en una cuadrícula reducida.
-- **Random Search**: 16 configuraciones del espacio global.
-- **Hyperband (Optuna)**: 16 candidatos nominales, recursos 20 → 60 → 180 árboles, `HyperbandPruner`, `RandomSampler` y `warm_start` dentro de cada fold. Puede podar ensayos; se reportan candidatos completos, podados y árboles consumidos. **No** se afirma presupuesto computacional idéntico.
-- **NSGA-II**: F1-CV máximo y tiempo de inferencia mínimo; soluciones no dominadas y regla de selección publicada antes de test.
-- Comparación independiente contra **Logistic Regression** y **Random Forest** en test: si el baseline supera al seleccionado, se declara y no se cambia el modelo tras mirar test.
-- **SHAP/LIME** para `Churn=1`, dos clientes del holdout; explicación no implica causalidad.
-- Las cifras económicas son **hipótesis**, no ahorro ni ROI probado; un piloto A/B sería necesario para medir el impacto causal.
+---
 
-## Resultados y archivos
-
-`artifacts/` contiene métricas CSV/JSON, pipelines `.joblib` y explicaciones; `figures/` las gráficas; `data/` el CSV original; `notebooks/02_Tarea7_Proyecto_Completo_Kevin_Erazo.ipynb` la evidencia reproducible. `build_pitch.py` crea `Pitch_RetenIA_Kevin_Erazo.tex` y `Pitch_RetenIA_Kevin_Erazo.pdf` **después de entrenar**, con las métricas de la nueva ejecución. Se requieren `pdflatex` y un PDF de **exactamente 5 páginas**, fondo claro, sin código.
-
-El despliegue remoto en Streamlit Community Cloud y el repositorio GitHub se deben publicar y comprobar con las credenciales de su propietario; este ZIP no puede contener una URL pública que no existe.
-
-## Documentación de la defensa
-
-La guía técnica y el libreto para la negociación se mantienen en `docs/`, **fuera de la interfaz comercial**.
+**RetenIA — Datos comprensibles. Riesgos visibles. Decisiones mejor fundamentadas.**
