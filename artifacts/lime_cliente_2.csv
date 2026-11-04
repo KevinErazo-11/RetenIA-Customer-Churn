@@ -1,0 +1,13 @@
+regla_lime,peso_lime_churn_1
+Contract=One year,-0.06507633380533046
+TotalCharges <= 402.98,0.045990757647158306
+TechSupport=No internet service,-0.03262546270548845
+OnlineSecurity=No internet service,-0.025831590008318504
+InternetService=No,-0.024976550142871055
+PaymentMethod=Mailed check,-0.02449192520562394
+PaperlessBilling=No,-0.019766082843303348
+DeviceProtection=No internet service,-0.01861794869318401
+gender=Male,-0.016298756747367867
+MultipleLines=No,-0.016110110382459773
+Dependents=Yes,0.013439661034797264
+MonthlyCharges <= 35.66,-0.013082368375102151

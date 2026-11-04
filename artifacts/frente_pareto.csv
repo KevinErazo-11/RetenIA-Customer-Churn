@@ -1,0 +1,5 @@
+trial,f1_cv,latencia_ms_cliente,roc_auc_cv,no_dominada,params
+2,0.5699984283484487,0.11679034375333686,0.8472468815713917,True,"{""modelo__max_depth"": 6, ""modelo__max_features"": 0.75, ""modelo__min_samples_leaf"": 6, ""modelo__n_estimators"": 180}"
+5,0.569677730350199,0.07969314063416277,0.8434069533018921,True,"{""modelo__max_depth"": 14, ""modelo__max_features"": ""sqrt"", ""modelo__min_samples_leaf"": 4, ""modelo__n_estimators"": 80}"
+14,0.5652043603400005,0.060899203120357015,0.8315462658646761,True,"{""modelo__max_depth"": null, ""modelo__max_features"": 0.5, ""modelo__min_samples_leaf"": 3, ""modelo__n_estimators"": 40}"
+7,0.5608315405934453,0.057471859378210866,0.8317062788066897,True,"{""modelo__max_depth"": 14, ""modelo__max_features"": 0.5, ""modelo__min_samples_leaf"": 3, ""modelo__n_estimators"": 40}"

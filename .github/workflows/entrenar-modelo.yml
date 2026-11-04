@@ -1,0 +1,40 @@
+name: Entrenar Telco real y guardar artefactos
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Descargar datos oficiales, entrenar y evaluar
+        run: python run_experiments.py
+      - name: Instalar LaTeX para la presentación PDF
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq texlive-latex-recommended texlive-latex-extra texlive-lang-spanish texlive-fonts-recommended
+      - name: Actualizar presentación PDF Beamer con métricas reales
+        run: python build_pitch.py
+      - name: Verificar evidencia generada (no quick)
+        run: python VALIDAR_ENTREGA.py
+      - name: Guardar CSV de fuente y artefactos verificados en el repositorio
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/ artifacts/ figures/ Pitch_RetenIA_Kevin_Erazo.pdf Pitch_RetenIA_Kevin_Erazo.tex
+          if ! git diff --cached --quiet; then
+            git commit -m 'Resultados reales Telco, modelos y pitch reproducibles'
+            git push
+          fi

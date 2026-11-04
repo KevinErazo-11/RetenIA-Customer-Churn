@@ -1,0 +1,65 @@
+{
+  "modelo_final": {
+    "accuracy": 0.794889992902768,
+    "precision": 0.6349206349206349,
+    "recall": 0.5347593582887701,
+    "f1": 0.5805515239477503,
+    "roc_auc": 0.8299491074427134,
+    "average_precision": 0.6327851348489345,
+    "matriz_confusion": [
+      [
+        920,
+        115
+      ],
+      [
+        174,
+        200
+      ]
+    ],
+    "test_size": 1409,
+    "threshold": 0.5,
+    "evaluacion": "Una evaluación en holdout final; no se ha usado para seleccionar el modelo."
+  },
+  "logistic_regression_baseline": {
+    "accuracy": 0.8055358410220014,
+    "precision": 0.6572327044025157,
+    "recall": 0.5588235294117647,
+    "f1": 0.6040462427745664,
+    "roc_auc": 0.8420341522643313,
+    "average_precision": 0.6337024099769349,
+    "matriz_confusion": [
+      [
+        926,
+        109
+      ],
+      [
+        165,
+        209
+      ]
+    ],
+    "test_size": 1409,
+    "threshold": 0.5,
+    "evaluacion": "Una evaluación en holdout final; no se ha usado para seleccionar el modelo."
+  },
+  "random_forest_baseline": {
+    "accuracy": 0.7835344215755855,
+    "precision": 0.6116504854368932,
+    "recall": 0.5053475935828877,
+    "f1": 0.5534407027818448,
+    "roc_auc": 0.8182528610917357,
+    "average_precision": 0.5996935289293546,
+    "matriz_confusion": [
+      [
+        915,
+        120
+      ],
+      [
+        185,
+        189
+      ]
+    ],
+    "test_size": 1409,
+    "threshold": 0.5,
+    "evaluacion": "Una evaluación en holdout final; no se ha usado para seleccionar el modelo."
+  }
+}

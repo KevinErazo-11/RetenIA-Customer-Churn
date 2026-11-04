@@ -1,0 +1,13 @@
+regla_lime,peso_lime_churn_1
+Contract=Month-to-month,0.16216612726521026
+tenure <= 9.00,0.10429674896638776
+InternetService=Fiber optic,0.0771066785914601
+TotalCharges <= 402.98,0.061478254793450524
+TechSupport=No,0.058846414797586254
+OnlineSecurity=No,0.057554008040610755
+PaymentMethod=Electronic check,0.03832007871152166
+SeniorCitizen=No,-0.0378513932737414
+35.66 < MonthlyCharges <= 70.50,-0.037186942919108845
+PhoneService=Yes,-0.029913696732202816
+StreamingMovies=No,-0.02220014008678164
+PaperlessBilling=Yes,0.01871868194402084

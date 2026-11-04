@@ -1,0 +1,15 @@
+{
+  "trial": 7,
+  "f1_cv": 0.5608315405934453,
+  "latencia_ms_cliente": 0.057471859378210866,
+  "params": {
+    "modelo__max_depth": 14,
+    "modelo__max_features": 0.5,
+    "modelo__min_samples_leaf": 3,
+    "modelo__n_estimators": 40
+  },
+  "tiempo_busqueda_s": 19.884347833998618,
+  "evaluaciones": 16,
+  "poblacion": 8,
+  "criterio": "F1 dentro de 0.01 del máximo de Pareto; escoger menor latencia (desempate F1)."
+}

@@ -1,0 +1,32 @@
+{
+  "estudiante": "Kevin Andrés Erazo Yepez",
+  "dataset": "blastchar/telco-customer-churn",
+  "dataset_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "fecha_ejecucion_utc": "2026-11-04T05:30:17.727790+00:00",
+  "semilla": 42,
+  "version_python": "3.14.4",
+  "modelo_final": {
+    "nombre": "NSGA-II (Pareto)",
+    "params": {
+      "modelo__max_depth": 14,
+      "modelo__max_features": 0.5,
+      "modelo__min_samples_leaf": 3,
+      "modelo__n_estimators": 40
+    },
+    "f1_cv": 0.5608315405934453,
+    "motivo": "F1 a menos de 0.015 del mejor RF y menor latencia elegible en Pareto."
+  },
+  "n_trials": 16,
+  "ejecucion_quick_no_entregable": false,
+  "optimizadores": [
+    "Grid Search",
+    "Random Search",
+    "Hyperband (Optuna)",
+    "NSGA-II"
+  ],
+  "limitaciones": [
+    "Dataset histórico sintético/de demostración; no validar generalización temporal sin datos de producción.",
+    "Latencia depende del hardware; no interpretar su segundo decimal como propiedad universal.",
+    "SHAP y LIME no prueban causalidad; eficacia de campañas es una hipótesis comercial."
+  ]
+}

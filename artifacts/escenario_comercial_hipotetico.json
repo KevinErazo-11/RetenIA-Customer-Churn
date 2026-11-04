@@ -1,0 +1,10 @@
+{
+  "contactados": 62,
+  "costo_acciones_usd": 496.0,
+  "costo_software_usd": 59.0,
+  "beneficio_bruto_esperado_usd": 2068.310861331776,
+  "resultado_neto_hipotetico_usd": 1513.3108613317759,
+  "roi_hipotetico": 2.7266862366338303,
+  "eficacia_minima_break_even": 0.0402502358598048,
+  "advertencia": "Supuestos no causales: sin ensayo A/B NO hay evidencia de uplift ni retorno real."
+}

@@ -1,0 +1,155 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands]{babel}
+\usepackage{lmodern,booktabs,tabularx,array}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\definecolor{navy}{HTML}{173750}
+\definecolor{teal}{HTML}{007F86}
+\definecolor{muted}{HTML}{586D7B}
+\definecolor{soft}{HTML}{EDF5F6}
+\definecolor{orange}{HTML}{A15A18}
+\definecolor{lightgray}{HTML}{F4F7F9}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.86\paperwidth,ht=3ex,dp=1.3ex,leftskip=.65cm]{normal text}\scriptsize\color{muted}RetenIA \quad | \quad Kevin Andrés Erazo Yepez \quad | \quad Business Pitch\end{beamercolorbox}\begin{beamercolorbox}[wd=.14\paperwidth,ht=3ex,dp=1.3ex,center]{normal text}\scriptsize\color{teal}\insertframenumber/5\end{beamercolorbox}}}
+\setbeamercolor{normal text}{fg=navy,bg=white}
+\setbeamercolor{frametitle}{fg=navy,bg=white}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamercolor{block title}{bg=soft,fg=teal}
+\setbeamercolor{block body}{bg=lightgray,fg=navy}
+\setbeamercolor{alerted text}{fg=orange}
+\setbeamertemplate{itemize item}{\color{teal}\small$\blacktriangleright$}
+\newcommand{\eyebrow}[1]{\vspace{-0.18cm}{\footnotesize\bfseries\color{teal}#1}\par\vspace{0.1cm}}
+\newcommand{\bigstat}[3]{\begin{minipage}[t]{.29\linewidth}\colorbox{soft}{\parbox{\dimexpr\linewidth-2\fboxsep}{\centering\vspace{.17cm}{\LARGE\bfseries\color{teal}#1}\par\vspace{.09cm}{\scriptsize\color{navy}#2}\vspace{.17cm}}}\\[.12cm]{\tiny\color{muted}#3}\end{minipage}}
+\begin{document}
+
+\begin{frame}[t]{La oportunidad: actuar antes de perder clientes}
+\eyebrow{01 / EL PROBLEMA}
+\vspace{.16cm}
+{\large Una operadora no puede gastar el mismo presupuesto de retención en todos los clientes.}\par
+\vspace{.43cm}
+\bigstat{7.043}{clientes en Telco}{Dataset de demostración}\hfill
+\bigstat{$\approx$26,5\%}{abandono histórico}{Clase minoritaria}\hfill
+\bigstat{19}{variables predictoras}{Perfil y servicios del cliente}
+\vspace{.47cm}
+\begin{block}{La pregunta de negocio}
+¿A quién contactar primero cuando los recursos comerciales son limitados?
+\end{block}
+\vspace{.15cm}
+{\small\color{muted}El reto no es solo clasificar: también evitar contactos innecesarios y pérdidas por bajas no detectadas.}
+\end{frame}
+
+\begin{frame}[t]{RetenIA: predicción, explicación y prioridad}
+\eyebrow{02 / LA SOLUCIÓN}
+\begin{columns}[T,onlytextwidth]
+\column{.52\textwidth}
+\begin{tikzpicture}[node distance=0.37cm, every node/.style={font=\small}, box/.style={draw=teal, rounded corners=3pt, fill=soft, text width=6.2cm, minimum height=.68cm, align=left, inner sep=6pt}]
+\node[box] (a) {\textbf{1. Diagnosticar} \quad Explorar segmentos};
+\node[box, below=of a] (b) {\textbf{2. Estimar} \quad P(Churn=1) individual};
+\node[box, below=of b] (c) {\textbf{3. Explicar} \quad SHAP y LIME por cliente};
+\node[box, below=of c] (d) {\textbf{4. Priorizar} \quad Ordenar por presupuesto};
+\draw[-{Latex[length=2mm]},teal,thick] (a)--(b);
+\draw[-{Latex[length=2mm]},teal,thick] (b)--(c);
+\draw[-{Latex[length=2mm]},teal,thick] (c)--(d);
+\end{tikzpicture}
+\column{.43\textwidth}
+\begin{block}{Para equipos de CRM}
+\begin{itemize}
+\item Panel interactivo de riesgo.
+\item Modelos exportados y reproducibles.
+\item Justificación de cada predicción.
+\item Simulador de contactos de retención.
+\end{itemize}
+\end{block}
+\vspace{.20cm}
+{\small\color{muted}El sistema apoya decisiones humanas. No reentrena dentro de Streamlit ni garantiza evitar bajas.}
+\end{columns}
+\end{frame}
+
+\begin{frame}[t]{Evidencia real: desempeño y selección transparente}
+\eyebrow{03 / VALIDACIÓN Y LIMITACIONES}
+\vspace{.12cm}
+\begin{center}
+\renewcommand{\arraystretch}{1.32}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Modelo (test reservado)} & \textbf{F1} & \textbf{Recall} & \textbf{ROC-AUC}\\
+\midrule
+Logistic Regression & \textbf{0.604} & 0.559 & 0.842\\
+Random Forest base & 0.553 & 0.505 & 0.818\\
+NSGA-II (Pareto) & 0.581 & 0.535 & 0.830\\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{.18cm}
+\begin{block}{Selección previa a la evaluación final}
+Configuración operativa: \textbf{NSGA-II (Pareto)}. Se aplicó el criterio F1-CV y, cuando correspondía, el compromiso con latencia de NSGA-II. F1-CV = \textbf{0.5608}.
+\end{block}
+\vspace{.10cm}
+{\small\color{orange}\textbf{Evidencia independiente:} Logistic Regression logró F1=0.604, superior al modelo operativo F1=0.581; no alteramos la selección tras test.}
+
+\end{frame}
+
+\begin{frame}[t]{Optimizar dos objetivos y explicar predicciones}
+\eyebrow{04 / HYPERPARAMETER OPTIMIZATION, NSGA-II + XAI}
+{\footnotesize\color{teal}Grid Search \quad | \quad Random Search \quad | \quad Hyperband (Optuna) \quad | \quad NSGA-II}\par
+\vspace{.07cm}
+\begin{columns}[T,onlytextwidth]
+\column{.48\textwidth}
+\begin{block}{Frente de Pareto}
+\centering\small $\max_{\theta}\;F1_{CV}(\theta)$ \quad y \quad $\min_{\theta}\;T_{infer}(\theta)$
+\vspace{.12cm}
+\begin{itemize}
+\item Soluciones no dominadas: no hay mejora simultánea gratuita.
+\item Se acepta hasta 0,01 de pérdida de F1 frente al máximo de Pareto para buscar menor latencia.
+\item La latencia depende del equipo y de la carga.
+\end{itemize}
+\end{block}
+\column{.48\textwidth}
+\begin{block}{Top variables SHAP (global)}
+\begin{tabular}{@{}lr@{}}
+\textbf{Variable} & \textbf{Importancia}\\
+\midrule
+Contract & 0.120\\tenure & 0.050\\OnlineSecurity & 0.045\\InternetService & 0.045\\
+\end{tabular}
+\end{block}
+\vspace{.09cm}
+{\small LIME explica dos clientes locales; la importancia del bosque compara reducciones de impureza.}
+\end{columns}
+\vspace{.10cm}
+{\scriptsize\color{muted}Mejor búsqueda monoobjetivo: Random Search (F1-CV=0.5736).}\par
+{\small\color{orange}\textbf{Precaución:} importancia predictiva no prueba causalidad.}
+\end{frame}
+
+\begin{frame}[t]{Oferta: piloto controlado antes de contratar}
+\eyebrow{05 / PROPUESTA Y CIERRE}
+\vspace{.20cm}
+\begin{columns}[T,onlytextwidth]
+\column{.50\textwidth}
+\begin{block}{Modelo comercial propuesto}
+\begin{itemize}
+\item Cliente: gerencia de CRM y retención.
+\item Producto: panel de riesgo, XAI y prioridad.
+\item Licencia \textbf{hipotética}: \textbf{USD 59/mes}.
+\item Costos, margen y eficacia son supuestos editables.
+\end{itemize}
+\end{block}
+\column{.45\textwidth}
+\begin{block}{Prueba que sí aporta evidencia}
+\begin{enumerate}
+\item Piloto A/B con grupo de control.
+\item Medir bajas evitadas de forma incremental.
+\item Estimar retorno neto con costos reales.
+\item Revisar privacidad, sesgos y consentimiento.
+\end{enumerate}
+\end{block}
+\end{columns}
+\vspace{.36cm}
+\begin{center}
+\colorbox{soft}{\parbox{.90\linewidth}{\centering\vspace{.20cm}\large\bfseries\color{teal}¿Podemos evaluar un piloto medible antes de escalar?\vspace{.20cm}}}
+\end{center}
+\vspace{.10cm}
+{\tiny\color{muted}Cifras predictivas: validación independiente del modelo tras nueva ejecución. Simulación comercial: supuestos no observados en Telco.}
+\end{frame}
+\end{document}

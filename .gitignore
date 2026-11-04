@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+.venv/
+.pytest_cache/
+.DS_Store
+# Modelos son parte del entregable: NO ignorar artifacts/*.joblib.
+
+# Respaldos y archivos de verificación
+*.bak
+*.backup.ipynb
+RetenIA_verificacion_notebook.zip
+
+# Archivos auxiliares de LaTeX
+*.aux
+*.log
+*.nav
+*.snm
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk

@@ -1,0 +1,11 @@
+{
+  "nombre": "NSGA-II (Pareto)",
+  "params": {
+    "modelo__max_depth": 14,
+    "modelo__max_features": 0.5,
+    "modelo__min_samples_leaf": 3,
+    "modelo__n_estimators": 40
+  },
+  "f1_cv": 0.5608315405934453,
+  "motivo": "F1 a menos de 0.015 del mejor RF y menor latencia elegible en Pareto."
+}

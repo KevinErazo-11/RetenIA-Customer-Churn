@@ -1,0 +1,23 @@
+{
+  "csv": "/home/kevin-erazo/OneDrive/8) Octavo Semestre/Aprendizaje Automatico/7. Optimización de Machine Learning, Explainable AI y Business Pitch/V2/data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
+  "sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "rows": 7043,
+  "columns_original": 21,
+  "features": 19,
+  "numeric_count": 3,
+  "categorical_count": 16,
+  "churn_yes": 1869,
+  "churn_no": 5174,
+  "churn_rate": 0.2653698707936959,
+  "totalcharges_filled_zero": 11,
+  "rows_dropped": 0,
+  "features_dropped": [
+    "customerID"
+  ],
+  "note": "Correcciones determinísticas y basadas en dominio; imputación/escala/OHE dentro de CV.",
+  "train_rows": 5634,
+  "test_rows": 1409,
+  "random_state": 42,
+  "cv_folds": 3,
+  "train_churn_rate": 0.2653532126375577
+}

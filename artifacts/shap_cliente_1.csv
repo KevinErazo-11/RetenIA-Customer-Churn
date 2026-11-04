@@ -1,0 +1,13 @@
+feature,SHAP_churn_1
+num__TotalCharges,0.17716087058361915
+cat__Contract_Month-to-month,0.15395404807364715
+num__tenure,0.1492628251635435
+cat__OnlineSecurity_No,0.06372126275946
+cat__InternetService_Fiber optic,0.04819086634191326
+cat__TechSupport_No,0.04705810786331957
+cat__PaymentMethod_Electronic check,0.025866267442740763
+num__MonthlyCharges,0.016233770516943222
+cat__InternetService_DSL,0.010516308227725077
+cat__PaperlessBilling_No,0.010105301411256377
+cat__Contract_Two year,0.008457413137397724
+cat__TechSupport_Yes,0.005632799920984551

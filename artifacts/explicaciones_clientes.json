@@ -1,0 +1,68 @@
+[
+  {
+    "cliente": 1,
+    "indice_original": "809",
+    "probabilidad": 0.9990196078431373,
+    "base_shap": 0.2661430599929003,
+    "shap_residual": 2.220446049250313e-16,
+    "lime_top_positivo": [
+      {
+        "regla_lime": "Contract=Month-to-month",
+        "peso_lime_churn_1": 0.16216612726521026
+      },
+      {
+        "regla_lime": "tenure <= 9.00",
+        "peso_lime_churn_1": 0.10429674896638776
+      },
+      {
+        "regla_lime": "InternetService=Fiber optic",
+        "peso_lime_churn_1": 0.0771066785914601
+      }
+    ],
+    "lime_top_negativo": [
+      {
+        "regla_lime": "SeniorCitizen=No",
+        "peso_lime_churn_1": -0.0378513932737414
+      },
+      {
+        "regla_lime": "35.66 < MonthlyCharges <= 70.50",
+        "peso_lime_churn_1": -0.037186942919108845
+      },
+      {
+        "regla_lime": "PhoneService=Yes",
+        "peso_lime_churn_1": -0.029913696732202816
+      }
+    ]
+  },
+  {
+    "cliente": 2,
+    "indice_original": "5082",
+    "probabilidad": 0.0,
+    "base_shap": 0.2661430599929003,
+    "shap_residual": 2.220446049250313e-16,
+    "lime_top_positivo": [
+      {
+        "regla_lime": "TotalCharges <= 402.98",
+        "peso_lime_churn_1": 0.045990757647158306
+      },
+      {
+        "regla_lime": "Dependents=Yes",
+        "peso_lime_churn_1": 0.013439661034797264
+      }
+    ],
+    "lime_top_negativo": [
+      {
+        "regla_lime": "Contract=One year",
+        "peso_lime_churn_1": -0.06507633380533046
+      },
+      {
+        "regla_lime": "TechSupport=No internet service",
+        "peso_lime_churn_1": -0.03262546270548845
+      },
+      {
+        "regla_lime": "OnlineSecurity=No internet service",
+        "peso_lime_churn_1": -0.025831590008318504
+      }
+    ]
+  }
+]
