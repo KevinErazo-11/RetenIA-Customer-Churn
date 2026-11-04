@@ -168,7 +168,7 @@ __SHAP_ROWS__
 {\small LIME explica dos clientes locales; la importancia del bosque compara reducciones de impureza.}
 \end{columns}
 \vspace{.10cm}
-{\scriptsize\color{muted}Mejor búsqueda monoobjetivo: __BEST_SEARCH__ (F1-CV=__BEST_F1__).}\par
+{\scriptsize\color{muted}Random Search y Hyperband (Optuna) empataron en F1-CV=__BEST_F1__; Random Search fue más rápido.}\par
 {\small\color{orange}\textbf{Precaución:} importancia predictiva no prueba causalidad.}
 \end{frame}
 
