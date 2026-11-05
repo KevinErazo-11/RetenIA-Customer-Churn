@@ -2,6 +2,8 @@
 
 **De la probabilidad de abandono a una prioridad de contacto justificable.**
 
+**Aplicación pública:** [Abrir FaroCX](https://farocx-retencion.streamlit.app)
+
 FaroCX es una plataforma de inteligencia comercial para equipos de retención en telecomunicaciones. Combina análisis de cartera, estimación de riesgo individual, explicaciones SHAP y LIME y simulación de campañas sujetas a un presupuesto. Su diferencia está en convertir una alerta predictiva en un **escenario de decisión**: a quién evaluar primero, qué señales explican el riesgo y cuánto costaría actuar.
 
 > **Propuesta central:** no todas las alertas merecen el mismo esfuerzo comercial. FaroCX permite analizar el beneficio neto esperado por contacto bajo supuestos editables, sin presentar esos supuestos como resultados observados.
