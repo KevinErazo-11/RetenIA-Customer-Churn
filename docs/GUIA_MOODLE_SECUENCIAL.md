@@ -1,4 +1,4 @@
-# Guía técnica privada para presentar RetenIA
+# Guía técnica privada para presentar FaroCX
 
 Este archivo es solo para estudiar y preparar la defensa, **no** se muestra en Streamlit.
 
@@ -15,7 +15,7 @@ Objetivos: maximizar F1 en CV y minimizar ms/cliente. Pareto = no dominado. No c
 SHAP global y local sobre los mismos dos perfiles que LIME. Clase positiva `Churn=1`. Comparar importancia global de SHAP con Feature Importance por impureza de Random Forest. Interpretar dirección local, no causalidad.
 
 ## Parte 5 · Streamlit (2)
-Mostrar producto RetenIA al comprador: EDA con filtros/gráficos/KPIs; comparación y Pareto; perfil de cliente con probabilidad y explicación; escenario de campañas. El portal NO muestra este guion ni menciona a Moodle o al profesor, y NO ajusta modelos.
+Mostrar producto FaroCX al comprador: EDA con filtros/gráficos/KPIs; comparación y Pareto; perfil de cliente con probabilidad y explicación; escenario de campañas. El portal NO muestra este guion ni menciona a Moodle o al profesor, y NO ajusta modelos.
 
 ## Parte 6 · Propuesta de negocio (1,5)
 Cliente potencial: equipo de CRM de una operadora. Valor: priorizar contactos. Licencia hipotética USD 59/mes. Diferenciar riesgo predictivo de ahorro causal. Proponer piloto A/B para medir bajas evitadas y retorno neto.

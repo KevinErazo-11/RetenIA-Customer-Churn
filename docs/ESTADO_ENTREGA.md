@@ -1,4 +1,4 @@
-# Estado de entrega de RetenIA / nueva versión con Hyperband
+# Estado de entrega de FaroCX / nueva versión con Hyperband
 
 Este ZIP **no** contiene datos entrenados de la versión anterior. Los resultados deben generarse desde cero con `python run_experiments.py`. Los directorios `artifacts/`, `figures/` y `data/` contienen README en lugar de métricas o CSV reales hasta que se ejecute el entrenamiento.
 

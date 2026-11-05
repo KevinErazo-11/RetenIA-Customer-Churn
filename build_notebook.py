@@ -19,7 +19,7 @@ new.cells.append(M('''# Tarea 7 · Optimización de Machine Learning, Explainabl
 
 **Kevin Andrés Erazo Yepez — Aprendizaje Automático**  
 **Dataset:** [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn).  
-**Producto:** RetenIA · inteligencia comercial de retención.
+**Producto:** FaroCX · inteligencia comercial de retención.
 
 Este notebook reproduce los requisitos en el orden del enunciado: preparación,
 modelos, Grid Search, Random Search, Hyperband, NSGA-II, SHAP, LIME,
@@ -223,7 +223,7 @@ for i in (1,2):
 '''))
 new.cells.append(M('''# Parte 5 · Streamlit
 
-`app.py` es el producto comercial RetenIA. Integra **Exploratory Data Analysis**
+`app.py` es el producto comercial FaroCX. Integra **Exploratory Data Analysis**
 (con visualizaciones, KPIs y filtros), **Model Performance**, **Hyperparameter
 Optimization**, **NSGA-II · Pareto Frontier**, **Explainable AI · SHAP y LIME**,
 **Prediction & Explainability** y **Business Application**.
@@ -232,12 +232,12 @@ La aplicación **no entrena**; carga pipelines `.joblib`, métricas y gráficos 
 El público no ve instrucciones de clase, un guion de exposición ni controles internos.
 Para ejecutarla desde el directorio raíz: `python -m streamlit run app.py`.
 '''))
-new.cells.append(M(r'''# Parte 6 · Propuesta comercial RetenIA
+new.cells.append(M(r'''# Parte 6 · Propuesta comercial FaroCX
 
 **Problema:** una operadora tiene recursos limitados para contactar a clientes,
 pero el abandono provoca pérdida potencial de margen.
 
-**Producto y comprador:** RetenIA es una plataforma de riesgo, explicación y
+**Producto y comprador:** FaroCX es una plataforma de riesgo, explicación y
 priorización de campañas para gerencias de CRM/retención.
 
 **Diferenciadores:** auditoría reproducible, Grid Search, Random Search,
@@ -293,7 +293,7 @@ print('SHAP top-3:', ', '.join(shap['Variable'].head(3)))
 print('Límites: los factores no son causas y el ROI comercial es un escenario hipotético.')
 '''))
 new.metadata = {
-    'kernelspec': {'display_name':'Python 3 (RetenIA)', 'language':'python','name':'python3'},
+    'kernelspec': {'display_name':'Python 3 (FaroCX)', 'language':'python','name':'python3'},
     'language_info': {'name':'python'},
 }
 DEST.parent.mkdir(exist_ok=True,parents=True)

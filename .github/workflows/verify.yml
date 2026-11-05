@@ -7,7 +7,7 @@ on:
       - 'tests/**'
       - 'app.py'
       - 'build_pitch.py'
-      - 'Pitch_RetenIA_Kevin_Erazo.tex'
+      - 'Pitch_FaroCX_Kevin_Erazo.tex'
       - 'requirements.txt'
 jobs:
   check:

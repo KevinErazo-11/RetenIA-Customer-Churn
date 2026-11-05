@@ -1,4 +1,4 @@
-"""RetenIA · Plataforma de inteligencia de retención de clientes.
+"""FaroCX · Plataforma de inteligencia de retención de clientes.
 
 Interfaz comercial. El análisis, el rendimiento, las explicaciones y los escenarios
 se derivan de los artefactos del proyecto. No se realizan ajustes del modelo aquí.
@@ -31,8 +31,8 @@ ART = PROJECT_ROOT / "artifacts"
 FIG = PROJECT_ROOT / "figures"
 
 st.set_page_config(
-    page_title="RetenIA | Inteligencia de retención",
-    page_icon="📡",
+    page_title="FaroCX | Inteligencia de retención",
+    page_icon="🧭",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -78,8 +78,8 @@ PAGES = [
 ]
 PAGE_ICONS = ["⌂", "◫", "◉", "⌁", "◇", "✦", "◎", "▤", "ⓘ"]
 
-st.sidebar.markdown("# 📡 RetenIA")
-st.sidebar.caption("Inteligencia para la retención de clientes")
+st.sidebar.markdown("# 🧭 FaroCX")
+st.sidebar.caption("De señales de riesgo a decisiones comerciales")
 st.sidebar.divider()
 st.sidebar.markdown("**PLATAFORMA**")
 selected = st.sidebar.radio(
@@ -205,7 +205,7 @@ def human_table(frame: pd.DataFrame, fmt: dict | None = None):
 
 
 if missing_data():
-    st.error("El servicio de análisis no está disponible temporalmente. Contacta al administrador de RetenIA.")
+    st.error("El servicio de análisis no está disponible temporalmente. Contacta al administrador de FaroCX.")
     LOGGER.error("Missing deployment assets: %s", missing_data())
     st.stop()
 
@@ -228,8 +228,8 @@ except Exception:
 if selected == "Inicio":
     page_title(
         "INTELIGENCIA COMERCIAL",
-        "Decide dónde concentrar tus esfuerzos de retención",
-        "RetenIA transforma los datos de clientes en señales de riesgo, explicaciones comprensibles y escenarios para orientar decisiones comerciales.",
+        "Deja de contactar a ciegas. Prioriza con evidencia.",
+        "FaroCX conecta el riesgo de abandono con explicaciones SHAP/LIME y una simulación de beneficio neto esperado por contacto. Decide dónde invertir un presupuesto limitado, sin confundir escenarios con resultados reales.",
     )
     a, b, c, d = st.columns(4)
     a.metric("Clientes analizados", f"{len(df):,}")
@@ -240,18 +240,18 @@ if selected == "Inicio":
     else:
         d.metric("Modelos disponibles", "1")
 
-    st.subheader("De los datos a la acción")
+    st.subheader("Del riesgo a la decisión")
     steps = [
         ("01", "Comprende tu cartera", "Explora segmentos, contratos, antigüedad y patrones de abandono."),
         ("02", "Valida la calidad", "Consulta métricas, alternativas de modelo y compromisos de rendimiento."),
         ("03", "Entiende el riesgo", "Revisa los factores más influyentes y sus explicaciones."),
-        ("04", "Activa decisiones", "Evalúa clientes individuales y construye escenarios de contacto."),
+        ("04", "Prioriza por valor", "Simula costos, margen y presupuesto para organizar campañas."),
     ]
     for row in [steps[:2], steps[2:]]:
         left, right = st.columns(2)
         for holder, (num, title, desc) in zip((left, right), row):
             with holder.container(border=True):
-                st.caption(f"{num} / RETENIA")
+                st.caption(f"{num} / FAROCX")
                 st.markdown(f"**{title}**")
                 st.write(desc)
     st.divider()
@@ -265,12 +265,12 @@ if selected == "Inicio":
         )
         show_chart(chart)
     with b:
-        st.subheader("Qué permite hacer RetenIA")
+        st.subheader("Qué permite hacer FaroCX")
         st.markdown(
             "**Segmentar:** identificar grupos que presentan diferentes tasas de abandono.\n\n"
             "**Predecir:** estimar el riesgo individual para un perfil de cliente.\n\n"
             "**Explicar:** visualizar los atributos que influyen en la estimación.\n\n"
-            "**Priorizar:** comparar posibles campañas bajo restricciones de presupuesto."
+            "**Priorizar:** ordenar contactos por beneficio neto esperado bajo supuestos editables."
         )
         st.caption("Las predicciones son estimaciones estadísticas y no garantizan el comportamiento futuro de ningún cliente.")
 
@@ -685,7 +685,7 @@ elif selected == "Prediction & Explainability":
 elif selected == "Business Application":
     page_title(
         "BUSINESS APPLICATION", "Planificar campañas de retención",
-        "Simula alternativas de contacto, asigna recursos y consulta qué clientes tendrían mayor beneficio esperado bajo los supuestos indicados.",
+        "Del riesgo a la acción: combina probabilidad, margen, eficacia hipotética y costo por contacto para explorar qué clientes priorizar con un presupuesto limitado.",
     )
     clients = csv_artifact("riesgos_clientes_demo.csv")
     a, b = st.columns(2)
@@ -720,7 +720,7 @@ elif selected == "Business Application":
     if "Contrato" in view.columns:
         view["Contrato"] = view["Contrato"].map(translate)
     st.dataframe(view.round(3), hide_index=True, width="stretch")
-    download_table(selected_clients, "retenia_escenario_comercial.csv", "Exportar cartera priorizada")
+    download_table(selected_clients, "farocx_escenario_comercial.csv", "Exportar cartera priorizada")
     with st.expander("Interpretación y alcance del escenario"):
         st.markdown(
             "El beneficio bruto por cliente se aproxima con la probabilidad de abandono, la efectividad incremental supuesta, "
@@ -733,7 +733,7 @@ elif selected == "Business Application":
 else:
     page_title(
         "TRANSPARENCIA Y GOBERNANZA", "Información del servicio",
-        "Alcance de RetenIA, evaluación de calidad y criterios para su utilización responsable en una operación comercial.",
+        "Alcance de FaroCX, evaluación de calidad y criterios para su utilización responsable en una operación comercial.",
     )
     a, b = st.columns(2)
     with a.container(border=True):
@@ -770,4 +770,4 @@ else:
     st.caption("Fuente de datos: Telco Customer Churn (Kaggle/IBM). Las cifras de rendimiento corresponden a una evaluación experimental del conjunto histórico.")
 
 st.divider()
-st.caption("RetenIA · Inteligencia para retención de clientes  |  Estimaciones sujetas a incertidumbre y revisión humana.")
+st.caption("FaroCX · Inteligencia para retención de clientes  |  Estimaciones sujetas a incertidumbre y revisión humana.")

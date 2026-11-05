@@ -1,4 +1,4 @@
-# Instalación limpia de RetenIA V2 en Ubuntu
+# Instalación limpia de FaroCX V2 en Ubuntu
 
 La versión nueva **no** reutiliza modelos ni métricas anteriores. **Se debe entrenar con el CSV oficial**.
 
@@ -16,7 +16,7 @@ python -m pip install -r requirements.txt
 python -m pip check
 python run_experiments.py
 python build_pitch.py
-pdfinfo Pitch_RetenIA_Kevin_Erazo.pdf | grep Pages
+pdfinfo Pitch_FaroCX_Kevin_Erazo.pdf | grep Pages
 python VALIDAR_ENTREGA.py
 python -m streamlit run app.py
 ```

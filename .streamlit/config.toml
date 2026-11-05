@@ -1,9 +1,9 @@
 [theme]
 base="dark"
-primaryColor="#26B4A9"
-backgroundColor="#0E1726"
-secondaryBackgroundColor="#172337"
-textColor="#E2E8F0"
+primaryColor="#E49A3F"
+backgroundColor="#0B1F2A"
+secondaryBackgroundColor="#12303D"
+textColor="#EBF4F2"
 font="sans serif"
 
 [server]

@@ -4,13 +4,13 @@
 
 ## Mensaje central
 
-**RetenIA** transforma señales de clientes en prioridades de contacto: estima la probabilidad de abandono, explica por qué el modelo asigna el riesgo y permite simular un presupuesto limitado. Es una herramienta de **apoyo a decisiones**, no un sistema que demuestre qué acción causa retención. Antes de vender un retorno, proponemos probarlo con un piloto controlado.
+**FaroCX** transforma señales de clientes en prioridades de contacto: estima la probabilidad de abandono, explica por qué el modelo asigna el riesgo y permite simular un presupuesto limitado. Es una herramienta de **apoyo a decisiones**, no un sistema que demuestre qué acción causa retención. Antes de vender un retorno, proponemos probarlo con un piloto controlado.
 
 ## Pitch de 2 minutos (guion sugerido)
 
 **0:00–0:22. Problema.** «Una operadora no puede contactar con la misma intensidad a todos sus clientes. El dataset Telco tiene 7.043 registros y una minoría de clientes que abandonan, alrededor del 26,5 %. Un clasificador que predice que nadie abandona tendría una Accuracy alta, pero sería inútil para retención».
 
-**0:22–0:49. Producto.** «Presento RetenIA, un panel con cuatro apartados: exploración de cartera, rendimiento de modelos, predicción explicable de nuevos clientes y priorización comercial. Un agente puede introducir los atributos de un cliente y consultar su probabilidad de abandono y los factores de riesgo del modelo».
+**0:22–0:49. Producto.** «Presento FaroCX, un panel con cuatro apartados: exploración de cartera, rendimiento de modelos, predicción explicable de nuevos clientes y priorización comercial. Un agente puede introducir los atributos de un cliente y consultar su probabilidad de abandono y los factores de riesgo del modelo».
 
 **0:49–1:17. Credibilidad.** «No decidimos por Accuracy solamente: comparamos Logistic Regression y Random Forest en validación cruzada y medimos Precision, Recall, F1 y ROC-AUC. Random Forest es la familia optimizada con Grid Search, Random Search, Hyperband y NSGA-II. El conjunto de prueba estuvo reservado hasta cerrar la elección; los resultados específicos deben mostrarse desde el artefacto real generado».
 
@@ -27,7 +27,7 @@ Mostrar en esta secuencia: (1) EDA y porcentaje churn con filtros; (2) Model Per
 ## Ronda comercial de 5 minutos — asignación
 
 - **Ronda 1, comprador (C→D):** Ismael Adrián Paredes Rosero te presentará su propuesta; pregunta por retorno incremental y prevención de leakage.
-- **Ronda 2, vendedor (D→E):** venderás RetenIA a Elvis Ismael Yangari Calva.
+- **Ronda 2, vendedor (D→E):** venderás FaroCX a Elvis Ismael Yangari Calva.
 - Los estudiantes sin turno deben observar y anotar preguntas; prepara respuestas al docente.
 
 ## Preguntas del profesor y respuestas defendibles
@@ -121,4 +121,4 @@ Pregunta a Ismael: «¿Qué evidencia del set reservado demuestra generalizació
 
 ## Cierre de un minuto
 
-«La decisión no es comprar una promesa de ingresos, sino probar una herramienta medible. RetenIA permite priorizar, explicar y simular costes con transparencia. Propongo un piloto delimitado, con métricas de éxito, control de privacidad y revisión de resultados antes de una suscripción anual. ¿Podemos acordar condiciones para ese piloto?»
+«La decisión no es comprar una promesa de ingresos, sino probar una herramienta medible. FaroCX permite priorizar, explicar y simular costes con transparencia. Propongo un piloto delimitado, con métricas de éxito, control de privacidad y revisión de resultados antes de una suscripción anual. ¿Podemos acordar condiciones para ese piloto?»

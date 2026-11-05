@@ -11,7 +11,7 @@ expected=[
  'artifacts/lime_cliente_1.png','artifacts/lime_cliente_2.png',
  'figures/matriz_confusion_test.png','figures/frente_pareto.png',
  'notebooks/02_Tarea7_Proyecto_Completo_Kevin_Erazo.ipynb','app.py',
- 'Pitch_RetenIA_Kevin_Erazo.pdf', 'Pitch_RetenIA_Kevin_Erazo.tex']
+ 'Pitch_FaroCX_Kevin_Erazo.pdf', 'Pitch_FaroCX_Kevin_Erazo.tex']
 missing=[x for x in expected if not (ROOT/x).exists()]
 if missing:
  print('NO COMPLETA: faltan estos artefactos reales:')
@@ -23,7 +23,7 @@ if manifest.get('ejecucion_quick_no_entregable'):
 # La presentación oficial es Beamer/PDF, con máximo 5 páginas.
 try:
     import fitz
-    doc = fitz.open(ROOT/'Pitch_RetenIA_Kevin_Erazo.pdf')
+    doc = fitz.open(ROOT/'Pitch_FaroCX_Kevin_Erazo.pdf')
     if len(doc) != 5:
         print('NO COMPLETA: el PDF debe tener exactamente cinco diapositivas.');sys.exit(3)
     print('Presentación PDF LaTeX: cinco diapositivas verificadas.')

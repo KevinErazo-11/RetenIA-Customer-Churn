@@ -22,3 +22,6 @@ RetenIA_verificacion_notebook.zip
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+
+# Respaldo local de la migración de marca
+.farocx_backup/

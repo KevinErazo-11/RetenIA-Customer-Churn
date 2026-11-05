@@ -33,7 +33,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/ artifacts/ figures/ Pitch_RetenIA_Kevin_Erazo.pdf Pitch_RetenIA_Kevin_Erazo.tex
+          git add data/ artifacts/ figures/ Pitch_FaroCX_Kevin_Erazo.pdf Pitch_FaroCX_Kevin_Erazo.tex
           if ! git diff --cached --quiet; then
             git commit -m 'Resultados reales Telco, modelos y pitch reproducibles'
             git push

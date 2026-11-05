@@ -1,247 +1,223 @@
-"""Genera CINCO diapositivas Beamer (fondo claro) y compila PDF con pdflatex.
-
-Usa exclusivamente los artefactos de la NUEVA ejecución; no recupera cifras
-antiguas ni inventa métricas cuando aún no se ha entrenado.
-
-Uso: python build_pitch.py
-Si pdflatex no está instalado, se genera de todos modos el .tex y se avisa.
+"""Genera un pitch comercial FaroCX de 5 diapositivas en LaTeX Beamer.
+Usa únicamente artefactos de evaluación existentes; no entrena ni modifica modelos.
 """
 from __future__ import annotations
 import json
-from pathlib import Path
 import shutil
 import subprocess
+from pathlib import Path
 import pandas as pd
 
-ROOT=Path(__file__).resolve().parent
-ART=ROOT/'artifacts'
-OUT_TEX=ROOT/'Pitch_RetenIA_Kevin_Erazo.tex'
-OUT_PDF=ROOT/'Pitch_RetenIA_Kevin_Erazo.pdf'
+ROOT = Path(__file__).resolve().parent
+ART = ROOT / 'artifacts'
+OUT_TEX = ROOT / 'Pitch_FaroCX_Kevin_Erazo.tex'
+OUT_PDF = ROOT / 'Pitch_FaroCX_Kevin_Erazo.pdf'
 
 
-def escape_latex(x):
-    s = str(x)
+def escape_latex(value):
     chars = {'\\': r'\textbackslash{}', '&': r'\&', '%': r'\%', '$': r'\$',
              '#': r'\#', '_': r'\_', '{': r'\{', '}': r'\}',
              '~': r'\textasciitilde{}', '^': r'\textasciicircum{}'}
-    return ''.join(chars.get(ch, ch) for ch in s)
+    return ''.join(chars.get(ch, ch) for ch in str(value))
 
 
 def load_data():
-    needed=['metricas_test_final.json','seleccion_modelo_final.json',
-            'shap_global.csv','comparacion_optimizadores_cv.csv',
-            'manifiesto_experimento.json']
-    missing=[name for name in needed if not (ART/name).is_file()]
+    required = ['metricas_test_final.json', 'comparacion_optimizadores_cv.csv',
+                'seleccion_modelo_final.json', 'eda_auditoria.json', 'shap_global.csv']
+    missing = [n for n in required if not (ART/n).exists()]
     if missing:
-        raise FileNotFoundError('Ejecuta primero python run_experiments.py; faltan: '+', '.join(missing))
-    manifest=json.loads((ART/'manifiesto_experimento.json').read_text(encoding='utf-8'))
-    if manifest.get('ejecucion_quick_no_entregable'):
-        raise ValueError('No se genera una presentación final con resultados --quick.')
-    metrics=json.loads((ART/'metricas_test_final.json').read_text(encoding='utf-8'))
-    selected=json.loads((ART/'seleccion_modelo_final.json').read_text(encoding='utf-8'))
-    shap=pd.read_csv(ART/'shap_global.csv').head(5).to_dict('records')
-    searches=pd.read_csv(ART/'comparacion_optimizadores_cv.csv').to_dict('records')
-    return metrics, selected, shap, searches, True
+        raise FileNotFoundError('Faltan artefactos ya entrenados: ' + ', '.join(missing))
+    metrics = json.loads((ART/'metricas_test_final.json').read_text(encoding='utf-8'))
+    optimizers = pd.read_csv(ART/'comparacion_optimizadores_cv.csv')
+    selected = json.loads((ART/'seleccion_modelo_final.json').read_text(encoding='utf-8'))
+    audit = json.loads((ART/'eda_auditoria.json').read_text(encoding='utf-8'))
+    shap = pd.read_csv(ART/'shap_global.csv')
+    return metrics, optimizers, selected, audit, shap
 
 
-def make_source(metrics,selection,shap,searches,is_local):
-    m=metrics['modelo_final'];lr=metrics['logistic_regression_baseline'];base=metrics['random_forest_baseline']
-    winner=max(searches,key=lambda v:float(v['f1_cv']))
-    prov='validación independiente del modelo tras nueva ejecución'
-    template=r"""\documentclass[aspectratio=169,10pt]{beamer}
+def make_source(metrics, optimizers, selected, audit, shap):
+    final = metrics['modelo_final']
+    lr = metrics['logistic_regression_baseline']
+    random = optimizers[optimizers['estrategia'].eq('Random Search')].iloc[0]
+    hyper = optimizers[optimizers['estrategia'].str.startswith('Hyperband')].iloc[0]
+    if abs(float(random.f1_cv)-float(hyper.f1_cv)) > 0.00005:
+        comparison = (f"Random Search: {float(random.f1_cv):.4f} F1-CV; "
+                      f"Hyperband: {float(hyper.f1_cv):.4f} F1-CV.")
+    else:
+        faster = 'Random Search' if float(random.tiempo_busqueda_s)<float(hyper.tiempo_busqueda_s) else 'Hyperband'
+        comparison = f"Random Search y Hyperband: F1-CV {float(random.f1_cv):.4f}; {faster} fue más rápido en esta ejecución."
+    n = int(audit['rows']); rate=float(audit['churn_rate']); churn=int(audit['churn_yes'])
+    main_shap = ', '.join(escape_latex(s) for s in shap.head(3)['Variable'])
+    context = {
+        '__N__':f'{n:,}'.replace(',','.'), '__RATE__':f'{rate*100:.1f}'.replace('.',','),
+        '__CHURN__':f'{churn:,}'.replace(',','.'),
+        '__F1__':f'{final["f1"]:.3f}', '__AUC__':f'{final["roc_auc"]:.3f}',
+        '__LR_F1__':f'{lr["f1"]:.3f}', '__LR_AUC__':f'{lr["roc_auc"]:.3f}',
+        '__CV__':f'{selected["f1_cv"]:.4f}',
+        '__COMP__':escape_latex(comparison), '__SHAP__':main_shap,
+    }
+    template = r"""\documentclass[aspectratio=169,10pt]{beamer}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish,es-noshorthands]{babel}
-\usepackage{lmodern,booktabs,tabularx,array}
+\usepackage{lmodern}
 \usepackage{tikz}
+\usepackage{array,booktabs,tabularx}
 \usetikzlibrary{positioning,arrows.meta}
-\definecolor{navy}{HTML}{173750}
-\definecolor{teal}{HTML}{007F86}
-\definecolor{muted}{HTML}{586D7B}
-\definecolor{soft}{HTML}{EDF5F6}
-\definecolor{orange}{HTML}{A15A18}
-\definecolor{lightgray}{HTML}{F4F7F9}
-\setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.86\paperwidth,ht=3ex,dp=1.3ex,leftskip=.65cm]{normal text}\scriptsize\color{muted}RetenIA \quad | \quad Kevin Andrés Erazo Yepez \quad | \quad Business Pitch\end{beamercolorbox}\begin{beamercolorbox}[wd=.14\paperwidth,ht=3ex,dp=1.3ex,center]{normal text}\scriptsize\color{teal}\insertframenumber/5\end{beamercolorbox}}}
-\setbeamercolor{normal text}{fg=navy,bg=white}
-\setbeamercolor{frametitle}{fg=navy,bg=white}
+\definecolor{ink}{HTML}{142F3D}
+\definecolor{teal}{HTML}{087C78}
+\definecolor{mint}{HTML}{EAF7F2}
+\definecolor{gold}{HTML}{E49A3F}
+\definecolor{light}{HTML}{F4F7F8}
+\definecolor{muted}{HTML}{536976}
+\setbeamercolor{normal text}{fg=ink,bg=white}
+\setbeamercolor{frametitle}{fg=ink,bg=white}
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
-\setbeamercolor{block title}{bg=soft,fg=teal}
-\setbeamercolor{block body}{bg=lightgray,fg=navy}
-\setbeamercolor{alerted text}{fg=orange}
-\setbeamertemplate{itemize item}{\color{teal}\small$\blacktriangleright$}
-\newcommand{\eyebrow}[1]{\vspace{-0.18cm}{\footnotesize\bfseries\color{teal}#1}\par\vspace{0.1cm}}
-\newcommand{\bigstat}[3]{\begin{minipage}[t]{.29\linewidth}\colorbox{soft}{\parbox{\dimexpr\linewidth-2\fboxsep}{\centering\vspace{.17cm}{\LARGE\bfseries\color{teal}#1}\par\vspace{.09cm}{\scriptsize\color{navy}#2}\vspace{.17cm}}}\\[.12cm]{\tiny\color{muted}#3}\end{minipage}}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.88\paperwidth,ht=3.4ex,dp=1ex,leftskip=.6cm]{normal text}\scriptsize\color{teal}\textbf{FARO\textit{CX}}\quad\color{muted} | Intelligence for retention \qquad\color{muted} Kevin Andrés Erazo Yepez\end{beamercolorbox}\begin{beamercolorbox}[wd=.12\paperwidth,ht=3.4ex,dp=1ex,center]{normal text}\scriptsize\color{teal}\insertframenumber\,/\,5\end{beamercolorbox}}}
+\newcommand{\eyebrow}[1]{{\vspace{-.15cm}\scriptsize\bfseries\color{teal}\MakeUppercase{#1}\par\vspace{.18cm}}}
+\newcommand{\kpi}[3]{\begin{minipage}{.29\linewidth}\colorbox{mint}{\parbox{\dimexpr\linewidth-2\fboxsep}{\centering\vspace{.16cm}\LARGE\bfseries\color{teal}#1\par\vspace{.09cm}{\small\color{ink}#2}\vspace{.16cm}}}\par\vspace{.08cm}{\scriptsize\color{muted}#3}\end{minipage}}
+\newcommand{\card}[2]{\colorbox{light}{\parbox{.90\linewidth}{\vspace{.12cm}\textbf{\color{teal}#1}\par\vspace{.09cm}{\small\color{ink}#2}\vspace{.14cm}}}}
 \begin{document}
 
-\begin{frame}[t]{La oportunidad: actuar antes de perder clientes}
-\eyebrow{01 / EL PROBLEMA}
-\vspace{.16cm}
-{\large Una operadora no puede gastar el mismo presupuesto de retención en todos los clientes.}\par
-\vspace{.43cm}
-\bigstat{7.043}{clientes en Telco}{Dataset de demostración}\hfill
-\bigstat{$\approx$26,5\%}{abandono histórico}{Clase minoritaria}\hfill
-\bigstat{19}{variables predictoras}{Perfil y servicios del cliente}
-\vspace{.47cm}
-\begin{block}{La pregunta de negocio}
-¿A quién contactar primero cuando los recursos comerciales son limitados?
-\end{block}
-\vspace{.15cm}
-{\small\color{muted}El reto no es solo clasificar: también evitar contactos innecesarios y pérdidas por bajas no detectadas.}
-\end{frame}
-
-\begin{frame}[t]{RetenIA: predicción, explicación y prioridad}
-\eyebrow{02 / LA SOLUCIÓN}
-\begin{columns}[T,onlytextwidth]
-\column{.52\textwidth}
-\begin{tikzpicture}[node distance=0.37cm, every node/.style={font=\small}, box/.style={draw=teal, rounded corners=3pt, fill=soft, text width=6.2cm, minimum height=.68cm, align=left, inner sep=6pt}]
-\node[box] (a) {\textbf{1. Diagnosticar} \quad Explorar segmentos};
-\node[box, below=of a] (b) {\textbf{2. Estimar} \quad P(Churn=1) individual};
-\node[box, below=of b] (c) {\textbf{3. Explicar} \quad SHAP y LIME por cliente};
-\node[box, below=of c] (d) {\textbf{4. Priorizar} \quad Ordenar por presupuesto};
-\draw[-{Latex[length=2mm]},teal,thick] (a)--(b);
-\draw[-{Latex[length=2mm]},teal,thick] (b)--(c);
-\draw[-{Latex[length=2mm]},teal,thick] (c)--(d);
-\end{tikzpicture}
-\column{.43\textwidth}
-\begin{block}{Para equipos de CRM}
-\begin{itemize}
-\item Panel interactivo de riesgo.
-\item Modelos exportados y reproducibles.
-\item Justificación de cada predicción.
-\item Simulador de contactos de retención.
-\end{itemize}
-\end{block}
-\vspace{.20cm}
-{\small\color{muted}El sistema apoya decisiones humanas. No reentrena dentro de Streamlit ni garantiza evitar bajas.}
-\end{columns}
-\end{frame}
-
-\begin{frame}[t]{Evidencia real: desempeño y selección transparente}
-\eyebrow{03 / VALIDACIÓN Y LIMITACIONES}
-\vspace{.12cm}
-\begin{center}
-\renewcommand{\arraystretch}{1.32}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Modelo (test reservado)} & \textbf{F1} & \textbf{Recall} & \textbf{ROC-AUC}\\
-\midrule
-Logistic Regression & \textbf{__LR_F1__} & __LR_REC__ & __LR_AUC__\\
-Random Forest base & __BASE_F1__ & __BASE_REC__ & __BASE_AUC__\\
-__SELECTED_NAME__ & __M_F1__ & __M_REC__ & __M_AUC__\\
-\bottomrule
-\end{tabular}
-\end{center}
-\vspace{.18cm}
-\begin{block}{Selección previa a la evaluación final}
-Configuración operativa: \textbf{__SELECTED_NAME__}. Se aplicó el criterio F1-CV y, cuando correspondía, el compromiso con latencia de NSGA-II. F1-CV = \textbf{__M_CV__}.
-\end{block}
-\vspace{.10cm}
-{\small\color{orange}\textbf{Evidencia independiente:} __BENCHMARK_NOTE__}
-
-\end{frame}
-
-\begin{frame}[t]{Optimizar dos objetivos y explicar predicciones}
-\eyebrow{04 / HYPERPARAMETER OPTIMIZATION, NSGA-II + XAI}
-{\footnotesize\color{teal}Grid Search \quad | \quad Random Search \quad | \quad Hyperband (Optuna) \quad | \quad NSGA-II}\par
+% 1. PROBLEMA Y POSICIONAMIENTO
+\begin{frame}[t]{La fuga se anticipa. La decisión también.}
+\eyebrow{01 / Oportunidad comercial}
 \vspace{.07cm}
-\begin{columns}[T,onlytextwidth]
-\column{.48\textwidth}
-\begin{block}{Frente de Pareto}
-\centering\small $\max_{\theta}\;F1_{CV}(\theta)$ \quad y \quad $\min_{\theta}\;T_{infer}(\theta)$
-\vspace{.12cm}
-\begin{itemize}
-\item Soluciones no dominadas: no hay mejora simultánea gratuita.
-\item Se acepta hasta 0,01 de pérdida de F1 frente al máximo de Pareto para buscar menor latencia.
-\item La latencia depende del equipo y de la carga.
-\end{itemize}
-\end{block}
-\column{.48\textwidth}
-\begin{block}{Top variables SHAP (global)}
-\begin{tabular}{@{}lr@{}}
-\textbf{Variable} & \textbf{Importancia}\\
-\midrule
-__SHAP_ROWS__
-\end{tabular}
-\end{block}
-\vspace{.09cm}
-{\small LIME explica dos clientes locales; la importancia del bosque compara reducciones de impureza.}
-\end{columns}
-\vspace{.10cm}
-{\scriptsize\color{muted}Random Search y Hyperband (Optuna) empataron en F1-CV=__BEST_F1__; Random Search fue más rápido.}\par
-{\small\color{orange}\textbf{Precaución:} importancia predictiva no prueba causalidad.}
+{\large En una operadora, cada contacto cuesta. Actuar a ciegas desperdicia presupuesto; no actuar deja pasar oportunidades de retención.}\par
+\vspace{.28cm}
+\kpi{__N__}{clientes}{Cartera histórica Telco}\hfill
+\kpi{__RATE__\%}{abandono observado}{No es una predicción futura}\hfill
+\kpi{__CHURN__}{bajas registradas}{Base pública de demostración}
+\vspace{.40cm}
+\colorbox{ink}{\parbox{.96\linewidth}{\vspace{.19cm}\centering\large\bfseries\color{white}No preguntamos solo quién podría irse.\\[.05cm]Preguntamos: ¿en quién conviene invertir primero?\vspace{.19cm}}}
+\vspace{.21cm}
+{\scriptsize\color{muted}FaroCX convierte un pronóstico estadístico en un escenario de priorización comercial; no garantiza que una intervención evite una baja.}
 \end{frame}
 
-\begin{frame}[t]{Oferta: piloto controlado antes de contratar}
-\eyebrow{05 / PROPUESTA Y CIERRE}
+% 2. LA SOLUCION
+\begin{frame}[t]{FaroCX: riesgo, explicación y acción en un solo flujo}
+\eyebrow{02 / Propuesta diferencial}
+\vspace{.10cm}
+\begin{columns}[T,onlytextwidth]
+\column{.31\textwidth}
+\card{01 \quad DETECTAR}{Estima el riesgo individual con un modelo evaluado sobre datos independientes.}
 \vspace{.20cm}
+\card{02 \quad ENTENDER}{SHAP y LIME muestran qué señales influyen en cada pronóstico.}
+\column{.31\textwidth}
+\card{03 \quad PRIORIZAR}{Ordena candidatos según el beneficio neto esperado y el presupuesto disponible.}
+\vspace{.20cm}
+\card{04 \quad MEDIR}{Propone validar el impacto de las campañas con un piloto controlado A/B.}
+\column{.32\textwidth}
+{\color{teal}\bfseries El valor no es una lista de porcentajes.}\par
+\vspace{.18cm}
+{\large Es una \textbf{lista de decisiones justificables}.}\par
+\vspace{.22cm}
+{\small\color{muted}Riesgo $\times$ eficacia supuesta $\times$ margen estimado $-$ costo de contacto.}
+\end{columns}
+\vspace{.32cm}
+{\small\color{teal}\textbf{Diferenciación:} el equipo de CRM puede variar presupuesto y costos para comparar escenarios antes de contactar.}
+\end{frame}
+
+% 3. DEMO
+\begin{frame}[t]{Una demostración que termina en una decisión}
+\eyebrow{03 / Producto funcionando en la nube}
+\vspace{.10cm}
+{\large Tres pantallas; una pregunta de negocio: \textbf{¿a quién contactamos primero?}}\par
+\vspace{.28cm}
+\begin{columns}[T,onlytextwidth]
+\column{.32\textwidth}
+\card{PERFIL}{Introducir datos de un cliente y consultar el riesgo estimado de abandono.}
+\column{.32\textwidth}
+\card{EXPLICACIÓN}{Mostrar factores locales SHAP y LIME: por qué el modelo emitió esa alerta.}
+\column{.32\textwidth}
+\card{CAMPAÑA}{Ajustar presupuesto, margen y costo de contacto; exportar una cartera priorizada.}
+\end{columns}
+\vspace{.40cm}
+\colorbox{mint}{\parbox{.96\linewidth}{\vspace{.16cm}\centering\bfseries\color{ink}FaroCX hace visible el paso de \textcolor{teal}{dato} a \textcolor{teal}{decisión}.\vspace{.16cm}}}
+\vspace{.24cm}
+{\scriptsize\color{muted}Los escenarios económicos son hipotéticos. Esta versión usa datos públicos de demostración y no integra información privada de clientes reales.}
+\end{frame}
+
+% 4. EVIDENCIA
+\begin{frame}[t]{Evidencia comprobable, sin promesas infladas}
+\eyebrow{04 / Validación e interpretabilidad}
+\vspace{.03cm}
 \begin{columns}[T,onlytextwidth]
 \column{.50\textwidth}
-\begin{block}{Modelo comercial propuesto}
-\begin{itemize}
-\item Cliente: gerencia de CRM y retención.
-\item Producto: panel de riesgo, XAI y prioridad.
-\item Licencia \textbf{hipotética}: \textbf{USD 59/mes}.
-\item Costos, margen y eficacia son supuestos editables.
-\end{itemize}
-\end{block}
-\column{.45\textwidth}
-\begin{block}{Prueba que sí aporta evidencia}
-\begin{enumerate}
-\item Piloto A/B con grupo de control.
-\item Medir bajas evitadas de forma incremental.
-\item Estimar retorno neto con costos reales.
-\item Revisar privacidad, sesgos y consentimiento.
-\end{enumerate}
-\end{block}
+{\small\bfseries Rendimiento en test reservado}\par\vspace{.08cm}
+\begin{tabular}{@{}lcc@{}}\toprule
+\small Modelo & \small F1 & \small ROC-AUC\\\midrule
+\small Logistic Regression & \textbf{__LR_F1__} & \textbf{__LR_AUC__}\\
+\small RF seleccionado por NSGA-II & __F1__ & __AUC__\\\bottomrule
+\end{tabular}
+\vspace{.17cm}
+{\scriptsize\color{muted}Logistic Regression obtuvo mejores métricas en test. El Random Forest fue seleccionado antes mediante criterios de F1-CV y latencia (F1-CV=__CV__).}
+\column{.46\textwidth}
+{\small\bfseries Modelos explicables para CRM}\par\vspace{.09cm}
+{\small SHAP global destaca: \textbf{__SHAP__}.}\par\vspace{.15cm}
+{\small LIME y SHAP explican el perfil individual.}\par\vspace{.15cm}
+{\small Grid Search, Random Search, Hyperband y NSGA-II documentan el proceso de optimización.}
 \end{columns}
-\vspace{.36cm}
-\begin{center}
-\colorbox{soft}{\parbox{.90\linewidth}{\centering\vspace{.20cm}\large\bfseries\color{teal}¿Podemos evaluar un piloto medible antes de escalar?\vspace{.20cm}}}
-\end{center}
-\vspace{.10cm}
-{\tiny\color{muted}Cifras predictivas: __PROVENANCE__. Simulación comercial: supuestos no observados en Telco.}
+\vspace{.32cm}
+\colorbox{light}{\parbox{.96\linewidth}{\vspace{.12cm}\scriptsize\color{muted}__COMP__\par\vspace{.06cm}Ni las explicaciones ni las simulaciones establecen causalidad ni efectividad comercial.\vspace{.12cm}}}
+\end{frame}
+
+% 5. NEGOCIACION
+\begin{frame}[t]{No le pido que compre una promesa. Le propongo medirla.}
+\eyebrow{05 / Propuesta comercial}
+\vspace{.08cm}
+\begin{columns}[T,onlytextwidth]
+\column{.48\textwidth}
+{\large\bfseries Piloto acotado con su equipo de CRM}\par\vspace{.18cm}
+\card{ALCANCE}{Cartera autorizada, perfiles de riesgo, explicaciones y escenarios de contacto.}
+\vspace{.16cm}
+\card{MODELO COMERCIAL}{Referencia inicial: USD 59/mes (hipótesis ajustable al alcance).}
+\column{.48\textwidth}
+{\large\bfseries Criterios de continuidad}\par\vspace{.18cm}
+\begin{enumerate}\small
+\item Calidad predictiva sobre datos del cliente.
+\item Costo por contacto y adopción por CRM.
+\item Bajas incrementales evitadas, medidas con control A/B.
+\item Privacidad, sesgos y seguridad revisados.
+\end{enumerate}
+\end{columns}
+\vspace{.33cm}
+\colorbox{ink}{\parbox{.96\linewidth}{\vspace{.21cm}\centering\large\bfseries\color{white}¿Definimos un piloto con presupuesto, métricas y fecha de revisión?\vspace{.21cm}}}
+\vspace{.13cm}
+{\scriptsize\color{muted}Se necesita un horizonte adecuado para observar bajas; no se afirma ROI ni reducción de churn demostrados.}
 \end{frame}
 \end{document}
 """
-    shaprows=r'\\'.join(f"{escape_latex(str(row['Variable']))} & {float(row['SHAP_importancia_abs_media']):.3f}" for row in shap[:4])+r'\\'
-    benchmark_note = (f'Logistic Regression logró F1={lr["f1"]:.3f}, superior al modelo operativo F1={m["f1"]:.3f}; no alteramos la selección tras test.'
-                      if lr['f1'] > m['f1'] else
-                      f'El modelo operativo obtuvo F1={m["f1"]:.3f}; Logistic Regression F1={lr["f1"]:.3f}.')
-    sub={
-        '__LR_F1__':f"{lr['f1']:.3f}", '__LR_REC__':f"{lr['recall']:.3f}", '__LR_AUC__':f"{lr['roc_auc']:.3f}",
-        '__BASE_F1__':f"{base['f1']:.3f}", '__BASE_REC__':f"{base['recall']:.3f}", '__BASE_AUC__':f"{base['roc_auc']:.3f}",
-        '__M_F1__':f"{m['f1']:.3f}", '__M_REC__':f"{m['recall']:.3f}", '__M_AUC__':f"{m['roc_auc']:.3f}",
-        '__M_CV__':f"{selection['f1_cv']:.4f}",
-        '__SELECTED_NAME__':escape_latex(selection['nombre']),
-        '__BENCHMARK_NOTE__':escape_latex(benchmark_note), '__BEST_SEARCH__':escape_latex(winner['estrategia']),
-        '__BEST_F1__':f"{winner['f1_cv']:.4f}", '__SHAP_ROWS__':shaprows, '__PROVENANCE__':escape_latex(prov),
-    }
-    for key,val in sub.items(): template=template.replace(key,val)
+    for k,v in context.items():
+        template=template.replace(k,v)
     return template
 
 
 def main():
-    met,chosen,shap,search,local=load_data()
-    OUT_TEX.write_text(make_source(met,chosen,shap,search,local),encoding='utf-8')
-    print('Fuente LaTeX generada:',OUT_TEX)
-    if shutil.which('pdflatex') is None:
-        print('PDF sin compilar: instala TeX Live (pdflatex), luego ejecuta python build_pitch.py')
+    data=load_data()
+    OUT_TEX.write_text(make_source(*data),encoding='utf-8')
+    print('Fuente LaTeX generada:', OUT_TEX)
+    if not shutil.which('pdflatex'):
+        print('pdflatex no está disponible; PDF no compilado')
         return
-    cmd=['pdflatex','-interaction=nonstopmode','-halt-on-error','-file-line-error','-output-directory',str(ROOT),str(OUT_TEX)]
+    cmd=['pdflatex','-interaction=nonstopmode','-halt-on-error','-file-line-error',
+         '-output-directory',str(ROOT),str(OUT_TEX)]
     for _ in range(2):
         proc=subprocess.run(cmd,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
         if proc.returncode:
-            print(proc.stdout[-5500:]);raise RuntimeError('Falló compilación LaTeX; revisa mensajes anteriores')
+            print(proc.stdout[-5000:])
+            raise RuntimeError('No se pudo compilar LaTeX')
     for ext in ('aux','log','nav','out','snm','toc'):
         p=ROOT/f'{OUT_TEX.stem}.{ext}'
         if p.exists():p.unlink()
     try:
         import fitz
-        if len(fitz.open(OUT_PDF))!=5:
-            raise RuntimeError('PDF Beamer debe tener exactamente cinco páginas')
+        assert len(fitz.open(OUT_PDF))==5, 'El PDF debe tener 5 páginas'
     except ImportError:
         pass
-    print('PDF generado (5 diapositivas):',OUT_PDF)
+    print('PDF generado (5 diapositivas):', OUT_PDF)
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    main()

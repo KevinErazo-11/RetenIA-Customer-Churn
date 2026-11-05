@@ -1,90 +1,55 @@
-# RetenIA
+# FaroCX
 
-**Inteligencia predictiva para retener clientes.**
+**De la probabilidad de abandono a una prioridad de contacto justificable.**
 
-RetenIA es una plataforma de análisis de abandono de clientes (*customer churn*) que transforma datos comerciales en estimaciones de riesgo, explicaciones interpretables y escenarios de priorización. Su interfaz interactiva permite explorar una cartera, evaluar perfiles individuales y orientar decisiones de retención con evidencia cuantitativa.
+FaroCX es una plataforma de inteligencia comercial para equipos de retención en telecomunicaciones. Combina análisis de cartera, estimación de riesgo individual, explicaciones SHAP y LIME y simulación de campañas sujetas a un presupuesto. Su diferencia está en convertir una alerta predictiva en un **escenario de decisión**: a quién evaluar primero, qué señales explican el riesgo y cuánto costaría actuar.
 
-**Enfoque:** telecomunicaciones · **Aplicación:** Streamlit · **Idioma:** español
+> **Propuesta central:** no todas las alertas merecen el mismo esfuerzo comercial. FaroCX permite analizar el beneficio neto esperado por contacto bajo supuestos editables, sin presentar esos supuestos como resultados observados.
 
----
+## Una plataforma orientada a la acción
 
-## Qué ofrece RetenIA
+| Capacidad | Decisión que facilita |
+|---|---|
+| Radar de cartera | Identificar segmentos con distinta incidencia histórica de churn. |
+| Riesgo individual | Estimar la probabilidad de abandono para un perfil concreto. |
+| Explicaciones SHAP y LIME | Comprender las señales que influyeron en la predicción. |
+| Planificador de campañas | Priorizar candidatos mediante costo por contacto, margen, eficacia supuesta y presupuesto. |
+| Transparencia del modelo | Revisar métricas, matriz de confusión, alternativas y frente de Pareto. |
 
-| Capacidad | Valor para el negocio |
-| --- | --- |
-| **Análisis de cartera** | Segmentación por contrato, antigüedad, servicios y facturación, con indicadores y filtros interactivos. |
-| **Predicción de abandono** | Estimación de la probabilidad de baja de un cliente a partir de su perfil. |
-| **Evaluación de modelos** | Comparación de calidad predictiva, errores de clasificación y curvas ROC y Precision–Recall. |
-| **Optimización inteligente** | Comparación de Grid Search, Random Search y Hyperband; análisis multiobjetivo con NSGA-II. |
-| **Explainable AI** | Interpretación global y local de predicciones mediante SHAP, LIME y Feature Importance. |
-| **Planificación comercial** | Priorización de contactos y simulación de campañas con presupuesto y supuestos ajustables. |
+El planificador utiliza un escenario simplificado de beneficio esperado por cliente, basado en probabilidad de abandono, eficacia incremental **hipotética**, margen y horizonte de análisis, menos costo de contacto. Este cálculo **no es una medición causal de clientes retenidos**.
 
-## Plataforma
+## Resultados de referencia
 
-La aplicación organiza el trabajo en nueve módulos: **Inicio**, **Exploratory Data Analysis**, **Model Performance**, **Hyperparameter Optimization**, **NSGA-II · Pareto Frontier**, **Explainable AI · SHAP y LIME**, **Prediction & Explainability**, **Business Application** e **Información del servicio**.
+Evaluación experimental con el conjunto público *Telco Customer Churn*: **7.043 registros**, **19 variables predictoras**, partición estratificada **80/20** y validación cruzada de tres particiones en entrenamiento.
 
-Los modelos y resultados se cargan desde artefactos previamente generados. **La aplicación no reentrena modelos durante su uso.**
+| Clasificador | F1 en test | ROC-AUC en test |
+|---|---:|---:|
+| Logistic Regression (benchmark) | 0,604 | 0,842 |
+| Random Forest seleccionado mediante NSGA-II | 0,581 | 0,830 |
 
-## Rendimiento predictivo
+Logistic Regression obtuvo mejor F1 y ROC-AUC en el conjunto de prueba. El Random Forest se seleccionó **antes** de abrir el test, mediante una regla de compromiso entre F1 en validación y latencia de inferencia. Esta selección no demuestra que sea la mejor alternativa para producción; ambas deberían compararse nuevamente con datos de la operadora.
 
-La evaluación se realiza sobre **1.409 clientes reservados para prueba**, separados del proceso de selección y optimización.
+Para optimizar Random Forest se emplearon **Grid Search, Random Search y Hyperband (Optuna)**; **NSGA-II** exploró simultáneamente F1 y latencia. Random Search y Hyperband alcanzaron F1-CV de 0,5736 en esta ejecución, con menor tiempo para Random Search.
 
-| Modelo | F1-score | ROC-AUC | Recall |
-| --- | ---: | ---: | ---: |
-| Logistic Regression | 0,604 | 0,842 | 0,559 |
-| Random Forest (base) | 0,553 | 0,818 | 0,505 |
-| Random Forest seleccionado mediante NSGA-II | 0,581 | 0,830 | 0,535 |
+## Arquitectura
 
-La solución seleccionada mediante **NSGA-II** considera conjuntamente el F1-score de validación cruzada y el tiempo de inferencia. **Logistic Regression obtuvo un F1-score superior en test**; esa diferencia se conserva explícitamente para una evaluación objetiva de alternativas. La latencia depende del entorno de ejecución.
+`CSV de telecomunicaciones → EDA → ColumnTransformer / Pipeline → Logistic Regression y Random Forest → HPO / NSGA-II → modelos exportados con joblib → SHAP / LIME → Streamlit`
 
-![Frente de Pareto: rendimiento frente a tiempo de inferencia](figures/frente_pareto.png)
-
-## Diseño técnico
-
-El flujo de análisis sigue cinco etapas:
-
-1. **Preparación de datos:** validación del esquema, tratamiento de `TotalCharges` y exclusión del identificador como predictor.
-2. **Preprocesamiento reproducible:** `ColumnTransformer` y `Pipeline` con escalado numérico y codificación One-Hot.
-3. **Validación:** partición estratificada 80/20 y validación cruzada estratificada de tres particiones dentro de entrenamiento.
-4. **Optimización:** Grid Search, Random Search, Hyperband (Optuna) y NSGA-II para explorar el compromiso entre calidad y latencia.
-5. **Interpretabilidad:** SHAP, LIME y Feature Importance para comprender las predicciones sin atribuirles causalidad.
-
-**Datos de referencia:** [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn), con 7.043 registros y 19 variables predictoras. Se trata de un conjunto de demostración; no representa una integración con datos operativos de una empresa.
+El portal no vuelve a entrenar el modelo al atender una consulta. El preprocesamiento, la clasificación y los artefactos de análisis quedan separados de la capa web.
 
 ## Ejecutar localmente
 
-Requisitos: Python, Git y un entorno virtual. Los modelos entrenados y el conjunto de datos de demostración están incluidos en el repositorio.
+Requiere Python compatible, dependencias de `requirements.txt` y los artefactos de modelo de `artifacts/` incluidos en el repositorio.
 
 ```bash
-git clone git@github.com:KevinErazo-11/RetenIA-Customer-Churn.git
-cd RetenIA-Customer-Churn
-python3 -m venv .venv
-source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-Abrir `http://localhost:8501` en el navegador.
+La presentación comercial de cinco diapositivas se genera con `python build_pitch.py` y LaTeX Beamer (`pdflatex`), usando los resultados guardados. No es necesario reentrenar para generar el PDF.
 
-## Estructura del repositorio
+## Adopción responsable
 
-```text
-app.py                   Plataforma interactiva
-src/                     Preparación de datos, optimización y lógica comercial
-artifacts/               Pipelines entrenados, métricas y explicaciones
-figures/                 Visualizaciones de evaluación
-notebooks/               Análisis exploratorio y experimentación reproducible
-data/                    Dataset de demostración
-tests/                   Pruebas automatizadas
-requirements.txt         Dependencias del entorno
-```
+FaroCX es una demostración funcional sobre datos históricos públicos. Las predicciones son estimaciones estadísticas; SHAP, LIME y Feature Importance no demuestran causalidad. Los resultados económicos de campañas son escenarios basados en supuestos, no reducciones observadas de churn. Antes de operar con datos privados se requieren controles de acceso, revisión de privacidad, validación temporal y un piloto A/B con métricas acordadas.
 
-Los experimentos pueden regenerarse con `python run_experiments.py`. Este proceso vuelve a entrenar modelos y puede producir diferencias en la selección basada en latencia; no es necesario para utilizar la aplicación con los artefactos incluidos.
-
-## Alcance y uso responsable
-
-RetenIA es una **demostración funcional de analítica predictiva**, no un sistema validado para decisiones automáticas en producción. Las probabilidades indican asociaciones estadísticas; SHAP y LIME no prueban relaciones causales. Los costos, tasas de respuesta y retornos de las simulaciones son **supuestos hipotéticos**, no resultados comerciales observados. Antes de su adopción operativa se requieren validación con datos reales, revisión de privacidad, monitoreo de desempeño y pruebas controladas de campañas.
-
----
-
-**RetenIA — Datos comprensibles. Riesgos visibles. Decisiones mejor fundamentadas.**
+**FaroCX — Menos contactos a ciegas. Más decisiones justificables.**
